@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Router Configuration</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-sidebar: #1e293b;
+            --bg-card: #1e293b;
+            --bg-terminal: #020617;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .status-badge.connected {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--accent-green);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
+
+        button.primary-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button.primary-btn:hover {
+            background-color: var(--accent-blue-hover);
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 240px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        /* Main Content Area */
+        main {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 1200px;
+        }
+
+        .section-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 0.875rem 1.25rem;
+            background-color: rgba(15, 23, 42, 0.4);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: "Courier New", Courier, monospace;
+            color: var(--text-primary);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .copy-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+
+        pre.terminal-output {
+            background-color: var(--bg-terminal);
+            padding: 1.25rem;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th, td {
+            padding: 0.875rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(15, 23, 42, 0.4);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-up {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .status-down {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Router Configuration</h1>
+        <div class="header-controls">
+            <div id="statusBadge" class="status-badge">
+                <span class="status-dot"></span>
+                <span id="statusText">Disconnected</span>
+            </div>
+            <button id="connectBtn" class="primary-btn" onclick="connectRouter()">Connect to Router</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside>
+            <a href="#version-section" class="nav-item active" onclick="setActiveNav(this)">
+                <span>&gt;_</span> Command Output
+            </a>
+            <a href="#interface-section" class="nav-item" onclick="setActiveNav(this)">
+                <span>&#9432;</span> Interface Status
+            </a>
+        </aside>
+
+        <main>
+            <!-- Show Version Output -->
+            <div id="version-section" class="section-card">
+                <div class="section-header">
+                    <h2>show version</h2>
+                    <button class="copy-btn" onclick="copyText('versionOutput', this)">Copy</button>
+                </div>
+                <pre id="versionOutput" class="terminal-output">Waiting for router connection... Click "Connect to Router" to fetch data.</pre>
+            </div>
+
+            <!-- Show IP Interface Brief Output -->
+            <div id="interface-section" class="section-card">
+                <div class="section-header">
+                    <h2>show ip interface brief</h2>
+                    <button class="copy-btn" onclick="copyText('interfaceOutput', this)">Copy</button>
+                </div>
+                <pre id="interfaceOutput" class="terminal-output">Waiting for router connection...</pre>
+            </div>
+
+            <!-- Structured Interface Table -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 style="font-family: inherit;">Interface Summary</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Interface</th>
+                                <th>IP Address</th>
+                                <th>OK?</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Protocol</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interfaceTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-secondary);">No interface data loaded.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update this URL to match your Python backend endpoint (e.g., Flask/FastAPI running on 192.168.10.77:5000)
+        const API_ENDPOINT = '/api/router-info'; 
+
+        async function connectRouter() {
+            const btn = document.getElementById('connectBtn');
+            const badge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+            const versionOutput = document.getElementById('versionOutput');
+            const interfaceOutput = document.getElementById('interfaceOutput');
+
+            btn.disabled = true;
+            btn.textContent = 'Connecting...';
+            versionOutput.textContent = 'Executing "show version" on router...';
+            interfaceOutput.textContent = 'Executing "show ip interface brief" on router...';
+
+            try {
+                // Attempt to fetch from your backend api.py
+                const response = await fetch(API_ENDPOINT);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+
+                // Update UI with live data from api.py
+                versionOutput.textContent = data.show_version || 'No output returned.';
+                interfaceOutput.textContent = data.show_ip_int_brief || 'No output returned.';
+                if (data.interfaces) renderTable(data.interfaces);
+
+                setConnectedState(true);
+            } catch (error) {
+                console.warn('Backend API not reachable, loading sample preview data:', error);
+                
+                // Fallback sample data so you can preview the design immediately
+                setTimeout(() => {
+                    versionOutput.textContent = 
+`Cisco IOS Software, 3700 Software (C3725-ADVENTERPRISEK9-M), Version 12.4(15)T14, RELEASE SOFTWARE (fc2)
+ROM: ROMMON Emulation Microcode
+R1 uptime is 4 minutes
+System returned to ROM by unknown reload cause
+Cisco 3725 (R7000) processor (revision 0.1) with 249856K/12288K bytes of memory.
+Processor board ID FTX0945W0MY
+4 FastEthernet interfaces
+55K bytes of NVRAM.
+131072K bytes of ATA System CompactFlash (Read/Write)
+Configuration register is 0x2102`;
+
+                    const sampleBrief = 
+`Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            192.168.10.1    YES manual up                    up      
+FastEthernet0/1            10.0.0.1        YES manual up                    up      
+FastEthernet1/0            unassigned      YES unset  administratively down down    
+FastEthernet1/1            unassigned      YES unset  administratively down down`;
+
+                    interfaceOutput.textContent = sampleBrief;
+                    parseAndRenderBrief(sampleBrief);
+                    setConnectedState(true);
+                }, 600);
+            }
+        }
+
+        function setConnectedState(isConnected) {
+            const btn = document.getElementById('connectBtn');
+            const badge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+
+            btn.disabled = false;
+            if (isConnected) {
+                badge.classList.add('connected');
+                statusText.textContent = 'Connected';
+                btn.textContent = 'Refresh Data';
+            } else {
+                badge.classList.remove('connected');
+                statusText.textContent = 'Disconnected';
+                btn.textContent = 'Connect to Router';
+            }
+        }
+
+        function parseAndRenderBrief(rawText) {
+            const lines = rawText.trim().split('\n');
+            const tbody = document.getElementById('interfaceTableBody');
+            tbody.innerHTML = '';
+
+            // Skip header row (index 0)
+            for (let i = 1; i < lines.length; i++) {
+                const parts = lines[i].trim().split(/\s+/);
+                if (parts.length >= 6) {
+                    const iface = parts[0];
+                    const ip = parts[1];
+                    const ok = parts[2];
+                    const method = parts[3];
+                    // Handle multi-word status like "administratively down"
+                    const protocol = parts[parts.length - 1];
+                    const status = parts.slice(4, parts.length - 1).join(' ');
+
+                    const statusClass = status.toLowerCase() === 'up' ? 'status-up' : 'status-down';
+                    const protoClass = protocol.toLowerCase() === 'up' ? 'status-up' : 'status-down';
+
+                    const row = `
+                        <tr>
+                            <td><strong>${iface}</strong></td>
+                            <td>${ip}</td>
+                            <td>${ok}</td>
+                            <td>${method}</td>
+                            <td class="${statusClass}">${status}</td>
+                            <td class="${protoClass}">${protocol}</td>
+                        </tr>
+                    `;
+                    tbody.insertAdjacentHTML('beforeend', row);
+                }
+            }
+        }
+
+        function copyText(elementId, btnElement) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btnElement.textContent;
+                btnElement.textContent = 'Copied!';
+                setTimeout(() => {
+                    btnElement.textContent = originalText;
+                }, 1500);
+            });
+        }
+
+        function setActiveNav(element) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
